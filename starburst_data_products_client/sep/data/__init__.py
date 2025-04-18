@@ -9,6 +9,6 @@ from .View import View
 from .AccessMetadata import AccessMetadata
 from .RelevantLinks import RelevantLinks
 from .DataProduct import DataProduct
-from .DataProductPublishStatus import DataProductPublishStatus
+from .DataProductWorkflowStatus import DataProductWorkflowStatus
 from .Domain import Domain
 from .Tag import Tag

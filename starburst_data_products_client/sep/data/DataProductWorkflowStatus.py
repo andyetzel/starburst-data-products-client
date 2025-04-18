@@ -4,15 +4,15 @@ from starburst_data_products_client.shared.models import JsonDataClass
 
 
 @dataclass
-class DataProductPublishError(JsonDataClass):
+class DataProductWorkflowError(JsonDataClass):
     entityType: str
     entityName: str
     message: str
 
 
 @dataclass
-class DataProductPublishStatus(JsonDataClass):
+class DataProductWorkflowStatus(JsonDataClass):
     workflowType: str
     status: str
-    errors: List[DataProductPublishError]
+    errors: List[DataProductWorkflowError]
     isFinalStatus: bool

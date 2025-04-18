@@ -14,27 +14,27 @@ from starburst_data_products_client.shared.models import JsonDataClass
 
 @dataclass
 class DataProduct(JsonDataClass):
-    id: str
+    id: Optional[str]
     name: str
     catalogName: str
     schemaName: str
     dataDomainId: str
     summary: str
     description: Optional[str]
-    createdBy: str
-    status: str
+    createdBy: Optional[str]
+    status: Optional[str]
     views: List[View]
     materializedViews: List[MaterializedView]
     owners: List[Owner]
     productOwners: Optional[List[Owner]]
     relevantLinks: List[RelevantLinks]
-    createdAt: datetime
-    updatedAt: datetime
-    updatedBy: str
+    createdAt: Optional[datetime]
+    updatedAt: Optional[datetime]
+    updatedBy: Optional[str]
     publishedAt: Optional[datetime]
     publishedBy: Optional[str]
     accessMetadata: Optional[AccessMetadata]
-    ratingsCount: int
-    userData: UserData
+    ratingsCount: Optional[int]
+    userData: Optional[UserData]
     matchesTrinoDefinition: Optional[bool]
-    bookmarkCount: int
+    bookmarkCount: Optional[int]
