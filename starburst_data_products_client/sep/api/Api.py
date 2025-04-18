@@ -1,5 +1,5 @@
 from starburst_data_products_client.sep.data import DataProductSearchResult
-from starburst_data_products_client.sep.data import DataProduct
+from starburst_data_products_client.sep.data import DataProduct, DataProductParameters
 from starburst_data_products_client.sep.data import Domain
 from starburst_data_products_client.sep.data import Tag
 from starburst_data_products_client.sep.data import DataProductWorkflowStatus
@@ -42,11 +42,11 @@ class Api:
                 if search_string is None or search_string in search_result.name]
 
     
-    def create_data_product(self, data_product: DataProduct) -> DataProduct:
+    def create_data_product(self, data_product: DataProductParameters) -> DataProduct:
         response = requests.post(
             url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}',
             auth=(self.username, self.password),
-            json=data_product.dumps()
+            json=data_product.asdict()
         )
         if not response.ok:
             raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')

@@ -38,3 +38,17 @@ class DataProduct(JsonDataClass):
     userData: Optional[UserData]
     matchesTrinoDefinition: Optional[bool]
     bookmarkCount: Optional[int]
+
+@dataclass
+class DataProductParameters(JsonDataClass):
+    name: str
+    catalogName: str
+    schemaName: str
+    dataDomainId: str
+    summary: str
+    description: Optional[str]
+    views: List[View]
+    materializedViews: List[MaterializedView]
+    owners: List[Owner]
+    relevantLinks: List[RelevantLinks]
+    

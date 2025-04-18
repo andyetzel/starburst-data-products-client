@@ -18,9 +18,15 @@ class TestSepDomains:
     
 
     def test_listing_domains(self):
+        created_domain = self.sep_api.create_domain('domain_1')
+        assert created_domain.name == 'domain_1'
         domains = self.sep_api.list_domains()
         assert len(domains) == 1
         assert domains[0].name == 'domain_1'
+        self.sep_api.delete_domain(created_domain.id)
+        with pytest.raises(Exception) as exc_info:
+            self.sep_api.get_domain(created_domain.id)
+        assert '404' in str(exc_info.value)
 
     
     def test_create_and_delete_domain(self):
