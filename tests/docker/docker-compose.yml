@@ -1,0 +1,90 @@
+services:
+  postgres:
+    image: postgres:12.7
+    container_name: postgres
+    user: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: starburst
+      POSTGRES_PASSWORD: starburstPassword
+      POSTGRES_DB: starburst
+      PGPASSWORD: starburstPassword
+    healthcheck:
+      test: ["CMD", "psql", "-h", "localhost", "-p", "5432", "-U", "starburst"]
+
+  minio:
+    hostname: minio
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - 9000:9000
+    volumes:
+      - ./minio-data/:/data/ # place Your s3 buckets in ./minio-data/
+    environment:
+      MINIO_ACCESS_KEY: minio-access-key
+      MINIO_SECRET_KEY: minio-secret-key
+    command: server /data
+
+  starburst:
+    image: starburstdata/starburst-enterprise:${STARBURST_VERSION}
+    container_name: starburst
+    ports:
+      - 8080:8080
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_started
+    volumes:
+      - ./config.properties:/etc/starburst/config.properties
+      - ./log.properties:/etc/starburst/log.properties
+      - ./catalog:/etc/starburst/catalog
+      - ./starburstdata.license:/etc/starburst/starburstdata.license
+    env_file:
+      - .env
+  
+  hive-metastore:
+    hostname: hms
+    image: 'starburstdata/hive:3.1.3-e.13'
+    ports:
+      - '9083:9083' # Metastore Thrift
+    environment:
+      HIVE_METASTORE_DRIVER: org.postgresql.Driver
+      HIVE_METASTORE_JDBC_URL: jdbc:postgresql://postgres:5432/starburst
+      HIVE_METASTORE_USER: starburst
+      HIVE_METASTORE_PASSWORD: starburstPassword
+      HIVE_METASTORE_WAREHOUSE_DIR: s3://datalake/
+      S3_ENDPOINT: http://minio:9000
+      S3_ACCESS_KEY: minio-access-key
+      S3_SECRET_KEY: minio-secret-key
+      S3_PATH_STYLE_ACCESS: "true"
+      REGION: ""
+      GOOGLE_CLOUD_KEY_FILE_PATH: ""
+      AZURE_ADL_CLIENT_ID: ""
+      AZURE_ADL_CREDENTIAL: ""
+      AZURE_ADL_REFRESH_URL: ""
+      AZURE_ABFS_STORAGE_ACCOUNT: ""
+      AZURE_ABFS_ACCESS_KEY: ""
+      AZURE_WASB_STORAGE_ACCOUNT: ""
+      AZURE_ABFS_OAUTH: ""
+      AZURE_ABFS_OAUTH_TOKEN_PROVIDER: ""
+      AZURE_ABFS_OAUTH_CLIENT_ID: ""
+      AZURE_ABFS_OAUTH_SECRET: ""
+      AZURE_ABFS_OAUTH_ENDPOINT: ""
+      AZURE_WASB_ACCESS_KEY: ""
+      HIVE_METASTORE_USERS_IN_ADMIN_ROLE: "admin"
+    depends_on:
+      - postgres
+
+  # This job will create the "datalake" bucket on Minio
+  mc-job:
+    image: minio/minio:latest
+    entrypoint: |
+      /bin/bash -c "
+      sleep 5;
+      /usr/bin/mc config --quiet host add myminio http://minio:9000 minio-access-key minio-secret-key;
+      /usr/bin/mc mb --quiet myminio/datalake
+      "
+    depends_on:
+      - minio
