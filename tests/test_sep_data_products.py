@@ -31,7 +31,6 @@ class TestSepDataProducts:
             )
         )
         assert created_data_product.name == 'dptest'
-        self.sep_api.delete_data_product(created_data_product.id)
         self.delete_data_product(created_data_product.id)
         self.sep_api.delete_domain(domain.id)
 
@@ -74,6 +73,31 @@ class TestSepDataProducts:
             self.check_data_product(data_product, available_dps)
         self.delete_data_product(dp1.id)
         self.delete_data_product(dp2.id)
+        self.sep_api.delete_domain(domain.id)
+    
+    
+    def test_data_product_tags(self):
+        domain = self.sep_api.create_domain('dpdomain')
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        # add tags
+        self.sep_api.update_tags(created_data_product.id, ['saoirse'])
+        # verify tags
+        tags = self.sep_api.get_tags(created_data_product.id)
+        assert len(tags) == 1
+        assert tags[0].value == 'saoirse'
+        self.sep_api.delete_tag(tags[0].id, created_data_product.id)
+        tags = self.sep_api.get_tags(created_data_product.id)
+        assert len(tags) == 0
+        self.delete_data_product(created_data_product.id)
         self.sep_api.delete_domain(domain.id)
 
 

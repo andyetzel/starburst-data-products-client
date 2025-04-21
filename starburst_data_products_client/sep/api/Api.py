@@ -12,7 +12,7 @@ class Api:
 
     DOMAIN_PATH = 'api/v1/dataProduct/domains'
     DATA_PRODUCT_PATH = 'api/v1/dataProduct/products'
-    DATA_PRODUCT_TAGS_PATH = 'api/v1/dataProduct/tags/products'
+    DATA_PRODUCT_TAGS_PATH = 'api/v1/dataProduct/tags'
 
     def __init__(self, host: str, username: str, password: str, protocol: str = 'https'):
         if '://' in host:
@@ -123,15 +123,35 @@ class Api:
 
 
     # --- tags API methods ---
-    def get_data_product_tags(self, dp_id: str) -> List[Tag]:
+    def update_tags(self, dp_id: str, tag_values: List[str]) -> Tag:
+        print(dumps([{"value": val} for val in tag_values]))
+        response = requests.put(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_TAGS_PATH}/products/{dp_id}',
+            auth=(self.username, self.password),
+            json=[{"value": val} for val in tag_values]
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+        return [Tag.load(result) for result in response.json()]
+        
+        
+    def get_tags(self, dp_id: str) -> List[Tag]:
         response = requests.get(
-            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_TAGS_PATH}/{dp_id}',
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_TAGS_PATH}/products/{dp_id}',
             auth=(self.username, self.password)
         )
         if not response.ok:
             raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
-
         return [Tag.load(result) for result in response.json()]
+    
+    
+    def delete_tag(self, tag_id: str, dp_id: str):
+        response = requests.delete(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_TAGS_PATH}/{tag_id}/products/{dp_id}',
+            auth=(self.username, self.password)
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
     
 
     # --- workflow API methods ---
