@@ -1,5 +1,5 @@
 from starburst_data_products_client.sep.api import Api as SepApi
-from starburst_data_products_client.sep.data import DataProductParameters
+from starburst_data_products_client.sep.data import DataProductParameters, Owner
 import pytest
 import time
 
@@ -101,6 +101,53 @@ class TestSepDataProducts:
         self.sep_api.delete_domain(domain.id)
 
 
+    def test_publish_data_product(self):
+        domain = self.sep_api.create_domain('dpdomain')
+        tpch_views = [
+            {
+                'name': 'nation_data_set',
+                'definitionQuery': 'select name as nation_name from tpch.tiny.nation'
+            }
+        ]
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id,
+                tpch_views,
+                [],
+                [Owner(name='saoirse', email='saoirse@saoirse.com')]
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        # add tags
+        self.sep_api.update_tags(created_data_product.id, ['saoirse'])
+        # verify tags
+        tags = self.sep_api.get_tags(created_data_product.id)
+        assert len(tags) == 1
+        assert tags[0].value == 'saoirse'
+        # publish data product
+        self.sep_api.publish_data_product(created_data_product.id)
+        # verify status
+        data_product_status = self.sep_api.get_publish_data_product_status(created_data_product.id)
+        attempts = 0
+        while data_product_status.isFinalStatus is not True and attempts < 10:
+            time.sleep(10)
+            data_product_status = self.sep_api.get_publish_data_product_status(created_data_product.id)
+            attempts += 1
+        assert data_product_status.isFinalStatus == True
+        print(data_product_status.errors)
+        assert len(data_product_status.errors) == 0
+        assert data_product_status.status == 'COMPLETED'
+        self.sep_api.delete_tag(tags[0].id, created_data_product.id)
+        tags = self.sep_api.get_tags(created_data_product.id)
+        assert len(tags) == 0
+        self.delete_data_product(created_data_product.id)
+        self.sep_api.delete_domain(domain.id)
+        
+
     def check_data_product(self, data_product_name, available_dps):
         for data_product in available_dps:
             if data_product.name == data_product_name:
@@ -110,7 +157,7 @@ class TestSepDataProducts:
                 assert data_product.createdBy == self.sep_user
     
     
-    def create_data_product_obj(self, name, catalog_name, schema_name, summary, domain_id, views=None):        
+    def create_data_product_obj(self, name, catalog_name, schema_name, summary, domain_id, views=None, mvs=None, owners=None):        
         return DataProductParameters(
             name=name,
             catalogName=catalog_name,
@@ -119,8 +166,8 @@ class TestSepDataProducts:
             summary=summary,
             description='dp created in unit tests',
             views=views if views else [],
-            materializedViews=[],
-            owners=[],
+            materializedViews=mvs if mvs else [],
+            owners=owners if owners else [],
             relevantLinks=[]
         )
     

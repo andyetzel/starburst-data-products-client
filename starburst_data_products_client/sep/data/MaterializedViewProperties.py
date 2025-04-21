@@ -5,5 +5,5 @@ from starburst_data_products_client.shared.models import JsonDataClass
 
 @dataclass
 class MaterializedViewProperties(JsonDataClass):
-    refresh_interval: str
+    refresh_interval: Optional[str]
     grace_period: Optional[str]
