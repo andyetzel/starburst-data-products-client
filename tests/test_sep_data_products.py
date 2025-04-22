@@ -147,6 +147,29 @@ class TestSepDataProducts:
         self.delete_data_product(created_data_product.id)
         self.sep_api.delete_domain(domain.id)
         
+    def test_clone_data_product(self):
+        domain = self.sep_api.create_domain('dpdomain')
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        cloned_data_product = self.sep_api.clone_data_product(
+            created_data_product.id,
+            'hive',
+            'dpclonetest',
+            'dpclone'
+        )
+        assert cloned_data_product.name == 'dpclone'
+        self.delete_data_product(created_data_product.id)
+        self.delete_data_product(cloned_data_product.id)
+        self.sep_api.delete_domain(domain.id)
+        
 
     def check_data_product(self, data_product_name, available_dps):
         for data_product in available_dps:

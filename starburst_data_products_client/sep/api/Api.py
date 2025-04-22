@@ -40,13 +40,38 @@ class Api:
         return [search_result for search_result in
                 [DataProductSearchResult.load(result) for result in response.json()]
                 if search_string is None or search_string in search_result.name]
-
+    
     
     def create_data_product(self, data_product: DataProductParameters) -> DataProduct:
         response = requests.post(
             url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}',
             auth=(self.username, self.password),
             json=data_product.asdict()
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+        return DataProduct.load(response.json())
+
+    
+    def clone_data_product(
+        self,
+        dp_id: str,
+        catalog_name: str,
+        new_schema_name: str,
+        new_name: str,
+        domain_id: str=None
+    ) -> DataProduct:
+        body={
+            'catalogName': catalog_name,
+            'newSchemaName': new_schema_name,
+            'newName': new_name
+        }
+        if domain_id is not None:
+            body['dataDomainId'] = domain_id
+        response = requests.post(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}/{dp_id}/clone',
+            auth=(self.username, self.password),
+            json=body
         )
         if not response.ok:
             raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
