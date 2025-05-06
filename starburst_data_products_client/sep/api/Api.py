@@ -1,8 +1,10 @@
 from starburst_data_products_client.sep.data import DataProductSearchResult
 from starburst_data_products_client.sep.data import DataProduct, DataProductParameters
-from starburst_data_products_client.sep.data import Domain
-from starburst_data_products_client.sep.data import Tag
 from starburst_data_products_client.sep.data import DataProductWorkflowStatus
+from starburst_data_products_client.sep.data import Domain
+from starburst_data_products_client.sep.data import SampleQuery
+from starburst_data_products_client.sep.data import Tag
+
 import requests
 from typing import List
 from json import dumps
@@ -86,6 +88,26 @@ class Api:
         if not response.ok:
             raise Exception('bad request' + str(response))
         return DataProduct.load(response.json())
+    
+    
+    def update_sample_queries(self, dp_id: str, sample_queries: List[SampleQuery]):
+        response = requests.put(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}/{dp_id}/sampleQueries',
+            auth=(self.username, self.password),
+            json=[{'name':query.name,'description':query.description,'query':query.query} for query in sample_queries]
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+    
+    
+    def list_sample_queries(self, dp_id: str) -> List[SampleQuery]:
+        response = requests.get(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}/{dp_id}/sampleQueries',
+            auth=(self.username, self.password)
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+        return [SampleQuery.load(result) for result in response.json()]
 
 
     # --- domain API methods ---
@@ -149,7 +171,6 @@ class Api:
 
     # --- tags API methods ---
     def update_tags(self, dp_id: str, tag_values: List[str]) -> Tag:
-        print(dumps([{"value": val} for val in tag_values]))
         response = requests.put(
             url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_TAGS_PATH}/products/{dp_id}',
             auth=(self.username, self.password),

@@ -1,5 +1,5 @@
 from starburst_data_products_client.sep.api import Api as SepApi
-from starburst_data_products_client.sep.data import DataProductParameters, Owner
+from starburst_data_products_client.sep.data import DataProductParameters, Owner, SampleQuery
 import pytest
 import time
 
@@ -168,6 +168,31 @@ class TestSepDataProducts:
         assert cloned_data_product.name == 'dpclone'
         self.delete_data_product(created_data_product.id)
         self.delete_data_product(cloned_data_product.id)
+        self.sep_api.delete_domain(domain.id)
+    
+    
+    def test_data_product_sample_queries(self):
+        domain = self.sep_api.create_domain('dpdomain')
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        dp_sample_queries = self.sep_api.list_sample_queries(created_data_product.id)
+        assert len(dp_sample_queries) == 0
+        self.sep_api.update_sample_queries(
+            created_data_product.id,
+            [SampleQuery(name='first',description='first description',query='select * from tpch.sf1.region')]
+        )
+        dp_sample_queries = self.sep_api.list_sample_queries(created_data_product.id)
+        assert len(dp_sample_queries) == 1
+        assert dp_sample_queries[0].name == 'first'
+        self.delete_data_product(created_data_product.id)
         self.sep_api.delete_domain(domain.id)
         
 

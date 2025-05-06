@@ -12,3 +12,4 @@ from .DataProduct import DataProduct, DataProductParameters
 from .DataProductWorkflowStatus import DataProductWorkflowStatus
 from .Domain import Domain
 from .Tag import Tag
+from .SampleQuery import SampleQuery
