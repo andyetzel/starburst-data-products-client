@@ -2,6 +2,7 @@ from starburst_data_products_client.sep.data import DataProductSearchResult
 from starburst_data_products_client.sep.data import DataProduct, DataProductParameters
 from starburst_data_products_client.sep.data import DataProductWorkflowStatus
 from starburst_data_products_client.sep.data import Domain
+from starburst_data_products_client.sep.data import MaterializedViewRefreshMetadata
 from starburst_data_products_client.sep.data import SampleQuery
 from starburst_data_products_client.sep.data import Tag
 
@@ -108,6 +109,19 @@ class Api:
         if not response.ok:
             raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
         return [SampleQuery.load(result) for result in response.json()]
+    
+    
+    def get_materialized_view_refresh_metadata(self, dp_id: str, view_name: str) -> MaterializedViewRefreshMetadata:
+        response = requests.get(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}/{dp_id}/materializedViews/{view_name}/refreshMetadata',
+            auth=(self.username, self.password)
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+        # response.json() will be None in scenario where no refresh has occurred yet
+        if response.json() is None:
+            return MaterializedViewRefreshMetadata(lastImport=None, incrementalColumn=None,refreshInterval=None,storageSchema=None,estimatedNextRefreshTime=None)
+        return MaterializedViewRefreshMetadata.load(response.json())
 
 
     # --- domain API methods ---

@@ -13,3 +13,5 @@ from .DataProductWorkflowStatus import DataProductWorkflowStatus
 from .Domain import Domain
 from .Tag import Tag
 from .SampleQuery import SampleQuery
+from .MaterializedViewImportMetadata import MaterializedViewImportMetadata
+from .MaterializedViewRefreshMetadata import MaterializedViewRefreshMetadata

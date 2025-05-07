@@ -194,6 +194,38 @@ class TestSepDataProducts:
         assert dp_sample_queries[0].name == 'first'
         self.delete_data_product(created_data_product.id)
         self.sep_api.delete_domain(domain.id)
+    
+    
+    def test_data_product_mv_refresh_data(self):
+        domain = self.sep_api.create_domain('dpdomain')
+        tpch_views = [
+            {
+                'name': 'nation_data_set',
+                'definitionQuery': 'select name as nation_name from tpch.tiny.nation'
+            }
+        ]
+        tpch_mvs = [
+            {
+                'name': 'region_data_set',
+                'definitionQuery': 'select name as region_name from tpch.tiny.region'
+            }
+        ]
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id,
+                tpch_views,
+                tpch_mvs
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        mv_refresh_metadata = self.sep_api.get_materialized_view_refresh_metadata(created_data_product.id, 'region_data_set')
+        assert mv_refresh_metadata.incrementalColumn == None
+        self.delete_data_product(created_data_product.id)
+        self.sep_api.delete_domain(domain.id)
         
 
     def check_data_product(self, data_product_name, available_dps):
