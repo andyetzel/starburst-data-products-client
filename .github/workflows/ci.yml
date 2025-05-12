@@ -46,6 +46,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
+          pip install poetry
           poetry install
       - name: Run tests
         run: |
