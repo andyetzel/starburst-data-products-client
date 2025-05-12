@@ -12,14 +12,14 @@ clean_up()
 {
     echo ""
     echo "====== Cleaning up ======"
-    docker-compose -f tests/docker/docker-compose.yml down
+    docker compose -f tests/docker/docker-compose.yml down
 }
 
 run_tests()
 {
     echo ""
     echo "====== Setting up test environment ======"
-    docker-compose -f tests/docker/docker-compose.yml up -d
+    docker compose -f tests/docker/docker-compose.yml up -d
 
     SEP_STARTING=true
     START_TIMEOUT=300
@@ -39,7 +39,7 @@ run_tests()
             else
                 echo "=============================="
                 echo "Test environment still running."
-                echo "Use 'docker-compose -f tests/docker/docker-compose.yml down' to tear down when done"
+                echo "Use 'docker compose -f tests/docker/docker-compose.yml down' to tear down when done"
             fi
             exit 1
         fi
@@ -92,5 +92,5 @@ if [ "${CLEANUP_ENV}" == "true" ]; then
 else
     echo "=============================="
     echo "Test environment still running."
-    echo "Use 'docker-compose -f tests/docker/docker-compose.yml down' to tear down when done"
+    echo "Use 'docker compose -f tests/docker/docker-compose.yml down' to tear down when done"
 fi
