@@ -6,7 +6,7 @@ authors = [
     {name = "Starburst Data", email = " <info@starburstdata.com>"}
 ]
 readme = "README.md"
-requires-python = ">=3.9,<4.0"
+requires-python = ">=3.11,<4.0"
 dependencies = [
     "requests (>=2.32.3,<3.0.0)",
     "marshmallow-dataclass (>=8.7.1,<9.0.0)",
@@ -21,4 +21,11 @@ build-backend = "poetry.core.masonry.api"
 [tool.poetry.group.test.dependencies]
 trino = "^0.333.0"
 testcontainers = "^4.10.0"
+
+
+[tool.poetry.group.docs.dependencies]
+sphinx = "^8.2.3"
+sphinxcontrib-jquery = "^4.1"
+sphinx-mdinclude = "^0.6.2"
+sphinx-material = "^0.0.36"
 

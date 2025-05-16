@@ -1,0 +1,21 @@
+{# Import the theme's layout. #}
+{% extends '!layout.html' %}
+
+{% block extrahead %}
+{{ super() }}
+<link href="https://fonts.googleapis.com/css2?family=Barlow&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
+{% set ending = ".html" %}
+{% set canonical_page = pagename + ending %}
+<!-- Always link to the latest version, as canonical -->
+<link rel="canonical" href="https://docs.starburst.io/latest/{{ canonical_page.replace("index.html", "").replace("index", "") }}">
+{% endblock %}
+
+{%- block content %}
+{{ super() }}
+{%- endblock %}
+
+{%- block footer %}
+{{ super() }}
+{% include 'footer.html' %}
+{%- endblock %}

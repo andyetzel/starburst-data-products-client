@@ -1,0 +1,44 @@
+<!-- custom footer should go here in time -->
+<div class="page-footer">
+  <div class="container md-grid">
+    <div class="row">
+      <div class="col-md-3">
+        <p style="font-weight:900">Resources</p>
+        <ul>
+          <li class="footer-item"><a href="https://docs.starburst.io/latest/index.html">Starburst Enterprise reference documentation</a></li>
+          <li class="footer-item"><a href="https://www.starburst.io/info/oreilly-trino-guide/" target="_blank">Free O'Reilly book - Trino: The Definitive Guide</a></li>
+          <li class="footer-item"><a href="https://trino.io/broadcast/" target="_blank">Trino Community Broadcast</a></li>
+          <li class="footer-item"><a href="https://blog.starburstdata.com/" target="_blank">Starburst blog</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3">
+        <p style="font-weight:900">Contact and more</p>
+        <ul>
+          <li class="footer-item"><a href="https://www.starburst.io" target="_blank">Starburst</a></li>
+          <li class="footer-item"><a href="https://www.starburst.io/info/starburst-intro-and-demo/" target="_blank">Join our weekly demos</a></li>
+          <li class="footer-item"><a href="https://www.starburst.io/#!" target="_blank">Start a trial</a></li>
+          <li class="footer-item"><a href="https://www.starburst.io/contact/" target="_blank">Contact us</a></li>
+        </ul>
+      </div>
+      <div class="col-md-3" style="text-align:right;">
+
+        <a href="https://www.starburst.io/" target="_blank">
+          {% if theme_logo_icon|e %}
+          <i class="md-icon">{{ theme_logo_icon }}</i>
+        {% elif logo %}
+            <img src="{{ pathto('_static/' ~ logo, 1) }}" height="26"
+                  alt="{{ shorttitle|striptags|e }} logo">
+        {% else %}
+          &nbsp;
+        {% endif %}
+        </a>
+        <li class="footer-item" style="padding-right:10px;">
+          <a href="https://docs.starburst.io/disclaimers.html#copyright">Copyright © 2017-2023<br> Starburst Data</a>
+        </li>
+        <li class="footer-item" style="padding-right:10px;">
+          <a href="https://docs.starburst.io/disclaimers.html#trademarks">Trademark information</a>
+        </li>
+      </div>
+    </div>
+  </div>
+</div>
