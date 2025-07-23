@@ -1,6 +1,6 @@
 [project]
 name = "starburst-data-products-client"
-version = "0.1.0"
+version = "0.1.1"
 description = "Client for the Starburst Galaxy and Enterprise data products REST APIs"
 authors = [
     {name = "Starburst Data", email = " <info@starburstdata.com>"}
