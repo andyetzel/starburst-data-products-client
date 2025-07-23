@@ -22,9 +22,24 @@ jobs:
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      - name: Debug secret presence
+        run: |
+          if [[ -z "${{ secrets.POETRY_PYPI_TOKEN_PYPI }}" ]]; then
+            echo "PYPI Token is missing"
+            exit 1
+          else
+            echo "PYPI Token is present"
+          fi
+
+      - name: Reset Poetry config
+        run: poetry config --unset pypi-token.pypi || true
  
       - name: Configure poetry
         run: poetry config pypi-token.pypi "${{ secrets.POETRY_PYPI_TOKEN_PYPI }}"
+
+      - name: Verify Poetry Auth
+        run: poetry config --list
 
       - name: Install dependencies
         run: poetry install --no-root
