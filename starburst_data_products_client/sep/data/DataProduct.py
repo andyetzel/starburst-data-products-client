@@ -35,6 +35,7 @@ class DataProduct(JsonDataClass):
     publishedBy: Optional[str]
     accessMetadata: Optional[AccessMetadata]
     ratingsCount: Optional[int]
+    ratingsAverage: Optional[float]
     userData: Optional[UserData]
     matchesTrinoDefinition: Optional[bool]
     bookmarkCount: Optional[int]

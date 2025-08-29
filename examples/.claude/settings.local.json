@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(/mnt/c/Starburst/Github/starburst-data-products-client/**)",
+      "Read(/mnt/c/Starburst/Github/starburst-data-products-client/**)",
+      "Read(/mnt/c/Starburst/Github/starburst-data-products-client/starburst_data_products_client/galaxy/api/**)",
+      "Read(/mnt/c/Starburst/Github/starburst-data-products-client/tests/**)",
+      "Read(/mnt/c/Starburst/Github/starburst-data-products-client/**)",
+      "Bash(python3:*)",
+      "Bash(timeout 30 python3:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

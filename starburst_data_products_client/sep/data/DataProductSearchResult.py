@@ -22,4 +22,5 @@ class DataProductSearchResult(JsonDataClass):
     lastQueriedAt: Optional[datetime]
     lastQueriedBy: Optional[str]
     ratingsCount: int
+    ratingsAverage: Optional[float]
     userData: dict

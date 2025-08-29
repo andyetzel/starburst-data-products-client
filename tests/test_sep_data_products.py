@@ -1,22 +1,70 @@
 from starburst_data_products_client.sep.api import Api as SepApi
 from starburst_data_products_client.sep.data import DataProductParameters, Owner, SampleQuery
+from starburst_data_products_client.shared.auth_config import AuthConfig, AuthenticationError
 import pytest
 import time
+import os
 
 
 class TestSepDataProducts:
 
     def setup_class(self):
+        # Default test configuration
         self.host = 'localhost'
         self.port = 8080
         self.sep_url = f'{self.host}:{self.port}'
         self.sep_user = 'sep_dp_api_user'
-        self.sep_api = SepApi(
-            host=self.sep_url,
-            username=self.sep_user,
-            password='',
-            protocol='http'
-        )
+        
+        # Try to use centralized authentication configuration first
+        try:
+            # Set up test environment variables if not already set
+            test_env = {
+                'SEP_HOST': os.environ.get('SEP_HOST', self.sep_url),
+                'SEP_PROTOCOL': os.environ.get('SEP_PROTOCOL', 'http'),
+                'SSL_VERIFY': os.environ.get('SSL_VERIFY', 'false'),
+                'AUTH_METHOD': os.environ.get('AUTH_METHOD', 'basic')
+            }
+            
+            # For basic auth, set default test credentials
+            if test_env['AUTH_METHOD'] == 'basic':
+                test_env.update({
+                    'SEP_USERNAME': os.environ.get('SEP_USERNAME', self.sep_user),
+                    'SEP_PASSWORD': os.environ.get('SEP_PASSWORD', '')
+                })
+            
+            # Temporarily set environment variables for auth config
+            original_env = {}
+            for key, value in test_env.items():
+                original_env[key] = os.environ.get(key)
+                os.environ[key] = value
+            
+            try:
+                # Create auth config and API client
+                auth_config = AuthConfig()
+                self.sep_api = auth_config.create_api_client()
+                auth_info = auth_config.get_auth_info()
+                print(f"Using {auth_info['method']} authentication for tests")
+                
+            finally:
+                # Restore original environment variables
+                for key, original_value in original_env.items():
+                    if original_value is None:
+                        os.environ.pop(key, None)
+                    else:
+                        os.environ[key] = original_value
+                        
+        except (AuthenticationError, ImportError) as e:
+            print(f"Centralized auth config failed: {e}")
+            print("Falling back to basic authentication for tests")
+            
+            # Fallback to basic authentication
+            self.sep_api = SepApi(
+                host=self.sep_url,
+                username=self.sep_user,
+                password='',
+                protocol='http',
+                verify_ssl=False  # Disable SSL verification for test environment
+            )
 
 
     def create_and_delete_data_product(self):
@@ -196,6 +244,54 @@ class TestSepDataProducts:
         self.sep_api.delete_domain(domain.id)
     
     
+    def test_update_data_product(self):
+        """Test updating a data product using the new update_data_product method."""
+        domain = self.sep_api.create_domain('dpdomain')
+        
+        # Create initial data product
+        created_data_product = self.sep_api.create_data_product(
+            self.create_data_product_obj(
+                'dptest',
+                'hive',
+                'dptest',
+                'this is a summary',
+                domain.id
+            )
+        )
+        assert created_data_product.name == 'dptest'
+        assert created_data_product.summary == 'this is a summary'
+        assert created_data_product.description == 'dp created in unit tests'
+        
+        # Update the data product with new information
+        updated_params = self.create_data_product_obj(
+            'dptest',  # Keep same name
+            'hive',
+            'dptest',
+            'this is an updated summary',  # Changed summary
+            domain.id,
+            owners=[Owner(name='Test Owner', email='test@example.com')]  # Added owner
+        )
+        updated_params.description = 'updated description for testing'  # Changed description
+        
+        updated_data_product = self.sep_api.update_data_product(created_data_product.id, updated_params)
+        
+        # Verify the updates
+        assert updated_data_product.name == 'dptest'
+        assert updated_data_product.summary == 'this is an updated summary'
+        assert updated_data_product.description == 'updated description for testing'
+        assert len(updated_data_product.owners) == 1
+        assert updated_data_product.owners[0].name == 'Test Owner'
+        assert updated_data_product.owners[0].email == 'test@example.com'
+        
+        # Verify by fetching the data product again
+        fetched_data_product = self.sep_api.get_data_product(created_data_product.id)
+        assert fetched_data_product.summary == 'this is an updated summary'
+        assert fetched_data_product.description == 'updated description for testing'
+        
+        self.delete_data_product(created_data_product.id)
+        self.sep_api.delete_domain(domain.id)
+    
+
     def test_data_product_mv_refresh_data(self):
         domain = self.sep_api.create_domain('dpdomain')
         tpch_views = [

@@ -1,4 +1,8 @@
-from typing import cast, Self, List, Any
+from typing import cast, List, Any
+try:
+    from typing import Self
+except ImportError:
+    from typing_extensions import Self
 import marshmallow_dataclass
 from dataclasses import asdict, is_dataclass
 from json import JSONEncoder, dumps
