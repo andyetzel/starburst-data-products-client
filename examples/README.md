@@ -170,6 +170,91 @@ python 6_cleanup_unused_tags.py
 
 **⚠️ Warning**: This script will analyze and potentially delete tags in your SEP cluster. Use with caution.
 
+### 7. Data Product Usage Statistics - `7_data_product_usage_statistics.py`
+
+**Purpose**: Demonstrates how to retrieve comprehensive usage statistics for data products from multiple API sources.
+
+**Operations**:
+- Gather query count statistics (7-day and 30-day windows)
+- Get unique user counts per data product
+- Access last query timestamps and user identification
+- Generate usage categorization and recency analysis
+- Create cross-product usage summaries and rankings
+- Collect data from multiple complementary API endpoints
+
+**Data Sources**:
+- **Statistics Endpoint**: `/api/v1/dataProduct/products/{id}/statistics`
+  - Query counts over different time windows
+  - Unique user counts per product
+  - Statistics update timestamps
+- **Access Metadata**: From `getDataProduct` response
+  - Last queried timestamp and user
+  - Historical access information
+
+**Usage**:
+```bash
+python 7_data_product_usage_statistics.py
+```
+
+**Safe to run**: ✅ This script performs only read operations and makes no changes to your data.
+
+### 8. Direct cURL Statistics Example - `8_direct_curl_statistics.py`
+
+**Purpose**: Demonstrates how to make direct HTTP requests to the statistics endpoint without the client library.
+
+**Operations**:
+- Generate proper authentication headers for Basic Auth and OAuth
+- Construct and execute HTTP requests using Python requests
+- Generate equivalent cURL commands for manual testing
+- Parse and display JSON responses in multiple formats
+- Show debugging information for troubleshooting
+
+**Supported Authentication**:
+- Basic Authentication (username/password)
+- OAuth2 JWT Bearer tokens
+
+**Usage**:
+```bash
+python 8_direct_curl_statistics.py
+```
+
+**Safe to run**: ✅ This script performs only read operations.
+
+### cURL Shell Script - `curl_statistics.sh`
+
+**Purpose**: Pure bash/curl implementation for direct API testing without Python dependencies.
+
+**Features**:
+- Environment variable configuration
+- Support for Basic Auth and OAuth authentication
+- SSL verification options
+- JSON response formatting (with jq if available)
+- Comprehensive error handling
+
+**Usage**:
+```bash
+# Basic Authentication
+export STARBURST_HOST="my-cluster.starburst.io"
+export STARBURST_AUTH_METHOD="basic"
+export STARBURST_USERNAME="myuser"
+export STARBURST_PASSWORD="mypass"
+./curl_statistics.sh 40b29ec1-9eeb-48a0-9799-c71c1651bb37
+
+# OAuth Authentication
+export STARBURST_HOST="my-cluster.starburst.io"  
+export STARBURST_AUTH_METHOD="oauth"
+export STARBURST_JWT_TOKEN="your-jwt-token-here"
+./curl_statistics.sh 40b29ec1-9eeb-48a0-9799-c71c1651bb37
+
+# OAuth Authentication (obtain token from your OAuth provider)
+export STARBURST_HOST="my-cluster.starburst.io"
+export STARBURST_AUTH_METHOD="oauth"  
+export STARBURST_JWT_TOKEN="your-actual-jwt-token-here"
+./curl_statistics.sh 40b29ec1-9eeb-48a0-9799-c71c1651bb37
+```
+
+**Safe to run**: ✅ This script performs only read operations.
+
 ## Running the Examples
 
 ### Interactive Mode
@@ -227,9 +312,12 @@ python 1_basic_operations_dry_run.py
 ## Best Practices
 
 ### Security
-- Never commit the `.env` file with real credentials
+- Never commit the `.env` file with real credentials to version control
+- Never hardcode JWT tokens or any secrets in scripts or documentation  
 - Use service accounts for automation
+- Store JWT tokens and other secrets only in `.env` file (which is in `.gitignore`)
 - Implement proper access controls for PII data
+- Regularly rotate OAuth tokens and passwords
 
 ### Development
 - Always test in a development environment first

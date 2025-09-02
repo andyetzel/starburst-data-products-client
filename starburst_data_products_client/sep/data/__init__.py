@@ -10,6 +10,7 @@ from .AccessMetadata import AccessMetadata
 from .RelevantLinks import RelevantLinks
 from .DataProduct import DataProduct, DataProductParameters
 from .DataProductWorkflowStatus import DataProductWorkflowStatus
+from .DataProductStatistics import DataProductStatistics
 from .Domain import Domain
 from .Tag import Tag
 from .SampleQuery import SampleQuery

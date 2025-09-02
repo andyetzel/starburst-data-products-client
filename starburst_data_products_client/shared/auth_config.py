@@ -25,7 +25,7 @@ For OAuth2 authentication:
 - No additional variables required (uses default OAuth2Authentication)
 
 For OAuth2 JWT authentication:
-- JWT_TOKEN: JWT token for authentication
+- SEP_JWT_TOKEN: JWT token for authentication
 
 For Kerberos authentication:
 - KERBEROS_SERVICE_NAME: Kerberos service name
@@ -157,7 +157,7 @@ class AuthConfig:
                 "Install with: pip install 'trino[all]'"
             )
         
-        jwt_token = self._get_required_env('JWT_TOKEN', 'JWT token for OAuth2 JWT authentication')
+        jwt_token = self._get_required_env('SEP_JWT_TOKEN', 'JWT token for OAuth2 JWT authentication')
         jwt_auth = JWTAuthentication(jwt_token)
         
         return {
@@ -242,7 +242,7 @@ class AuthConfig:
             info['username'] = os.getenv('SEP_USERNAME', 'Not set')
             info['password'] = '***' if os.getenv('SEP_PASSWORD') else 'Not set'
         elif self.method == 'oauth2_jwt':
-            info['jwt_token'] = '***' if os.getenv('JWT_TOKEN') else 'Not set'
+            info['jwt_token'] = '***' if os.getenv('SEP_JWT_TOKEN') else 'Not set'
         elif self.method == 'kerberos':
             info['service_name'] = os.getenv('KERBEROS_SERVICE_NAME', 'Not set')
             info['config'] = os.getenv('KERBEROS_CONFIG', 'Not set')

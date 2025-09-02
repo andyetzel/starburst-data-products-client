@@ -1,6 +1,7 @@
 from starburst_data_products_client.sep.data import DataProductSearchResult
 from starburst_data_products_client.sep.data import DataProduct, DataProductParameters
 from starburst_data_products_client.sep.data import DataProductWorkflowStatus
+from starburst_data_products_client.sep.data import DataProductStatistics
 from starburst_data_products_client.sep.data import Domain
 from starburst_data_products_client.sep.data import MaterializedViewRefreshMetadata
 from starburst_data_products_client.sep.data import SampleQuery
@@ -256,6 +257,29 @@ class Api:
         if not response.ok:
             raise Exception('bad request' + str(response))
         return DataProduct.load(response.json())
+    
+
+    def get_data_product_statistics(self, dp_id: str) -> DataProductStatistics:
+        """Get usage statistics for a specific data product.
+
+        Args:
+            dp_id (str): ID of the data product to retrieve statistics for
+
+        Returns:
+            DataProductStatistics: Usage statistics including query counts and user metrics
+
+        Raises:
+            Exception: If the API request fails
+        """
+        auth_kwargs = self._get_auth_kwargs()
+        response = requests.get(
+            url=f'{self.protocol}://{self.host}/{self.DATA_PRODUCT_PATH}/{dp_id}/statistics',
+            verify=self.verify_ssl,
+            **auth_kwargs
+        )
+        if not response.ok:
+            raise Exception(f'Request returned code {response.status_code}.\nResponse body: {response.text}')
+        return DataProductStatistics.load(response.json())
     
 
     def update_data_product(self, dp_id: str, data_product: DataProductParameters) -> DataProduct:

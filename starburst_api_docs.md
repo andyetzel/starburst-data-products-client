@@ -648,6 +648,40 @@ Update sample queries for a data product.
 ]
 ```
 
+### Get Data Product Statistics
+
+**Endpoint:** `GET /api/v1/dataProduct/products/{dataProductId}/statistics`
+
+Get usage statistics for a specific data product including query counts and user metrics.
+
+#### Parameters
+
+**Path Parameters:**
+- `dataProductId` (UUID, required): Data product ID
+
+#### Response Schema
+
+**200 - Success**
+```json
+{
+  "dataProductId": "092437b6-c6c0-4351-ba50-6b353fa19551",
+  "sevenDayQueryCount": 4,
+  "thirtyDayQueryCount": 22,
+  "sevenDayUserCount": 2,
+  "thirtyDayUserCount": 9,
+  "updatedAt": "2025-08-29T00:00:59.490309Z"
+}
+```
+
+#### Response Field Descriptions
+
+- `dataProductId`: UUID of the data product
+- `sevenDayQueryCount`: Number of queries executed against this data product in the last 7 days
+- `thirtyDayQueryCount`: Number of queries executed against this data product in the last 30 days  
+- `sevenDayUserCount`: Number of unique users who queried this data product in the last 7 days
+- `thirtyDayUserCount`: Number of unique users who queried this data product in the last 30 days
+- `updatedAt`: Timestamp when these statistics were last calculated
+
 ### Update View in Data Product
 
 **Endpoint:** `PUT /api/v1/dataProduct/products/{dataProductId}/views`
